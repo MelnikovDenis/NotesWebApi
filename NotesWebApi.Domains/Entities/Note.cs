@@ -23,6 +23,6 @@ public class NoteConfiguration : IEntityTypeConfiguration<Note>
         builder.Property(n => n.CreationTime).IsRequired().HasColumnType("datetime");
         builder.Property(n => n.LastUpdateTime).IsRequired().HasColumnType("datetime");
 
-        builder.HasOne(n => n.Group).WithMany(g => g.Notes).HasForeignKey("GroupId").OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(n => n.Group).WithMany(g => g.Notes).HasForeignKey("GroupId").OnDelete(DeleteBehavior.Cascade).IsRequired();
     }
 }
