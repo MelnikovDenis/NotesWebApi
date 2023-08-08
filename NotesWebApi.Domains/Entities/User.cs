@@ -9,7 +9,6 @@ public class User
     public string Nickname { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
-    public string Salt { get; set; } = null!;
     public List<NotesGroup> Groups { get; set; } = null!;
 }
 
@@ -23,6 +22,5 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Nickname).IsRequired();
         builder.Property(u => u.Email).IsRequired();
         builder.Property(u => u.PasswordHash).IsRequired();
-        builder.Property(u => u.Salt).IsRequired();
     }
 }
