@@ -1,10 +1,11 @@
-﻿using NotesWebApi.Domains.Entities;
+﻿using Microsoft.AspNetCore.Http;
+using NotesWebApi.Domains.Entities;
 using NotesWebApi.Services.Dto;
 
 namespace NotesWebApi.Services;
 
 public interface IAuthService
 {    
-    public string CreateAccessToken(User user);
-    public Task<UserInfoDto> RegisterAsync(UserRegisterDto user); 
+    public Task<UserInfoDto> RegisterAsync(UserRegisterDto userDto);
+    public Task<string> LoginAsync(UserLoginDto userDto, HttpResponse httpResponse);
 }

@@ -9,7 +9,8 @@ public class User
     public string Nickname { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
-    public List<NotesGroup> Groups { get; set; } = null!;
+    public List<NotesGroup> Groups { get; set; } = new List<NotesGroup>();
+    public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }
 
 public class UserConfiguration : IEntityTypeConfiguration<User>

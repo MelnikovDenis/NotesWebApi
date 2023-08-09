@@ -22,4 +22,9 @@ public class AuthenticationController : ControllerBase
     {
         return Ok(await AuthService.RegisterAsync(userDto));
     }
+    [HttpPost("Login")]
+    public async Task<IActionResult> Login(UserLoginDto userDto)
+    {
+        return Ok(await AuthService.LoginAsync(userDto, Response));
+    }
 }

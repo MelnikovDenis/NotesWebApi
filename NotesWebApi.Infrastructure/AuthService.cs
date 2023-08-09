@@ -1,27 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using NotesWebApi.Domains.Entities;
 using NotesWebApi.Domains.Persistence;
 using NotesWebApi.Services;
 using NotesWebApi.Services.Dto;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
-using System.Security.Claims;
-using System.Text;
 
 namespace NotesWebApi.Infrastructure;
 
 public class AuthService : IAuthService
 {
-    private IConfiguration Configuration { get; }
+   
     private IPasswordService PasswordService { get; }
+    private ITokenService TokenService { get; }
     private ApplicationContext Context { get; }
-    public AuthService(IConfiguration configuration, ApplicationContext context, IPasswordService passwordService)
+    public AuthService(ApplicationContext context, IPasswordService passwordService, ITokenService tokenService)
     {
-        Configuration = configuration;
         Context = context;
         PasswordService = passwordService;
+        TokenService = tokenService;
     }
     public async Task<UserInfoDto> RegisterAsync(UserRegisterDto userDto) 
     {
@@ -31,21 +28,19 @@ public class AuthService : IAuthService
         await Context.Users.AddAsync(user);
         await Context.SaveChangesAsync();
         return user.ToDto();
-    }
-    public string CreateAccessToken(User user)
+    }    
+    public async Task<string> LoginAsync(UserLoginDto userDto, HttpResponse httpResponse)
     {
-        var issuer = Configuration.GetSection("JwtSettings:Issuer").Value;
-        var claims = new List<Claim> { new Claim(ClaimTypes.Email, user.Email) };
-        var expires = DateTime.UtcNow.Add(TimeSpan.FromSeconds(double.Parse(Configuration.GetSection("JwtSettings:AccessTokenExpires").Value!)));
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(
-                Configuration.GetSection("JwtSettings:TokenKey").Value!
-            )
-        );
-       
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-        var token = new JwtSecurityToken(issuer, null, claims, null, expires, credentials);
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var user = await Context.Users.FirstOrDefaultAsync(u => u.Email == userDto.Email.ToLower().Normalize())
+            ?? throw new HttpRequestException("User with this email does not exist.", null, HttpStatusCode.Unauthorized);
+        
+        if (!PasswordService.VerifyPasswordHash(user.PasswordHash, userDto.Password))
+            throw new HttpRequestException("Incorrect password.", null, HttpStatusCode.Unauthorized);
+
+        RefreshToken refreshToken = TokenService.CreateRefreshToken(user);
+        await TokenService.SetRefreshTokenAsync(refreshToken, httpResponse);
+        await TokenService.DeleteExpiredTokensAsync(user);
+
+        return TokenService.CreateAccessToken(user);
     }
-   
 }

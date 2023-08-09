@@ -1,7 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using NotesWebApi.Domains.Persistence;
 using NotesWebApi.Infrastructure;
 using NotesWebApi.Services;
+using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,10 +15,45 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(
+    options =>
+    {
+        options.AddSecurityDefinition("oauth2",
+            new OpenApiSecurityScheme
+            {
+                Description = "Standard Authorization header using the Bearer scheme.",
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer"
+            }
+        );
+        options.OperationFilter<SecurityRequirementsOperationFilter>();
+    }
+);
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
+    options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration.GetSection("JwtSettings:Issuer").Value,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
+                .GetBytes(builder.Configuration.GetSection("JwtSettings:TokenKey").Value!)),
+            ValidateIssuerSigningKey = true
+        };
+    }
+);
+
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddTransient<IPasswordService, BcryptPasswordService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddTransient<ITokenService, TokenService>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,6 +66,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 

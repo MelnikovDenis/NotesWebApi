@@ -9,7 +9,7 @@ public class NotesGroup
     public string Title { get; set; } = null!;
     public User Author { get; set; } = null!;
     public DateTime LastUpdateTime { get; set; }
-    public List<Note> Notes { get; set; } = null!; 
+    public List<Note> Notes { get; set; } = new List<Note>();
 }
 public class NotesGroupConfiguration : IEntityTypeConfiguration<NotesGroup>
 {
