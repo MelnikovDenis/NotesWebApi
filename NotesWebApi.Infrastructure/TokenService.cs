@@ -6,6 +6,7 @@ using NotesWebApi.Domains.Entities;
 using NotesWebApi.Domains.Persistence;
 using NotesWebApi.Services;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 namespace NotesWebApi.Infrastructure;
@@ -44,7 +45,7 @@ public class TokenService : ITokenService
         };
         return refreshToken;
     }
-    public async Task SetRefreshTokenAsync(RefreshToken refreshToken, HttpResponse httpResponse) 
+    public async Task SetRefreshTokenAsync(RefreshToken refreshToken, IResponseCookies cookies) 
     {
         var cookieOptions = new CookieOptions
         {
@@ -52,7 +53,7 @@ public class TokenService : ITokenService
             Secure = true,
             Expires = refreshToken.Expires            
         };
-        httpResponse.Cookies.Append("RefreshToken", refreshToken.Token.ToString(), cookieOptions);
+        cookies.Append("RefreshToken", refreshToken.Token.ToString(), cookieOptions);
         Context.RefreshTokens.Add(refreshToken);
         await Context.SaveChangesAsync();
     }
@@ -62,5 +63,5 @@ public class TokenService : ITokenService
             .Include(t => t.Owner)
             .Where(t => t.Owner.Id == user.Id && t.Expires < DateTime.UtcNow)
             .ExecuteDeleteAsync();
-    }
+    }    
 }
