@@ -3,7 +3,7 @@ using NotesWebApi.Domains.Entities;
 
 namespace NotesWebApi.Services;
 /// <summary>
-///  Интерфейс сервиса выпуска, подтверждения и удаления токенов
+///  Интерфейс сервиса выпуска, получения и удаления токенов
 /// </summary>
 public interface ITokenService
 {
@@ -18,10 +18,17 @@ public interface ITokenService
     /// <summary>
     ///  Устанавливает refresh-токен в cookie
     /// </summary>
-    /// <param name="cookies">Необходим для установки refresh-токена в cookie</param>
-    public Task SetRefreshTokenAsync(RefreshToken refreshToken, IResponseCookies cookies);
+    public Task SetRefreshTokenAsync(RefreshToken refreshToken);
     /// <summary>
-    ///  Удаляет из базы данных истёкшие cookie, связанные с пользователем
+    ///  Удаляет из базы данных истёкшие refresh-токены, связанные с пользователем
     /// </summary>
     public Task DeleteExpiredTokensAsync(User user);
+    /// <summary>
+    ///  Извлекает refresh-токен из cookie
+    /// </summary>
+    public Guid GetRefreshToken();
+    /// <summary>
+    ///  Находит пользователя по claim'ам
+    /// </summary>
+    public Task<User> GetUserFromClaims();
 }

@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NotesWebApi.Services;
 using NotesWebApi.Services.Dto;
-using System.Security.Claims;
 
 namespace NotesWebApi.Presentation.Controllers;
 
@@ -27,23 +24,23 @@ public class AuthenticationController : ControllerBase
     [HttpPost("Login")]
     public async Task<IActionResult> LoginAsync(UserLoginDto userDto)
     {
-        return Ok(await AuthService.LoginAsync(userDto, Response.Cookies));
+        return Ok(await AuthService.LoginAsync(userDto));
     }
     [HttpPost("RefreshToken")]
     public async Task<IActionResult> RefreshToken() 
     {
-        return Ok(await AuthService.RefreshTokenAsync(Request.Cookies));
+        return Ok(await AuthService.RefreshTokenAsync());
     }
     [HttpPost("AllLogout"), Authorize]
     public async Task<IActionResult> AllLogout() 
     {
-        await AuthService.AllLogoutAsync(HttpContext.User);
+        await AuthService.AllLogoutAsync();
         return Ok();
     }
     [HttpPost("Logout"), Authorize]
     public async Task<IActionResult> LogoutAsync() 
     {
-        await AuthService.LogoutAsync(Request.Cookies);
+        await AuthService.LogoutAsync();
         return Ok();
     }
 }

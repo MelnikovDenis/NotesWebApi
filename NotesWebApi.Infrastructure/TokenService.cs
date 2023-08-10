@@ -15,10 +15,12 @@ public class TokenService : ITokenService
 {
     private IConfiguration Configuration { get; }
     private ApplicationContext Context { get; }
-    public TokenService(IConfiguration configuration, ApplicationContext context)
+    private IHttpContextAccessor HttpContextAccessor { get; }
+    public TokenService(IConfiguration configuration, ApplicationContext context, IHttpContextAccessor httpContextAccessor)
     {
         Configuration = configuration;
         Context = context;
+        HttpContextAccessor = httpContextAccessor;
     }
     public string CreateAccessToken(User user)
     {
@@ -45,7 +47,7 @@ public class TokenService : ITokenService
         };
         return refreshToken;
     }
-    public async Task SetRefreshTokenAsync(RefreshToken refreshToken, IResponseCookies cookies) 
+    public async Task SetRefreshTokenAsync(RefreshToken refreshToken) 
     {
         var cookieOptions = new CookieOptions
         {
@@ -53,7 +55,7 @@ public class TokenService : ITokenService
             Secure = true,
             Expires = refreshToken.Expires            
         };
-        cookies.Append("RefreshToken", refreshToken.Token.ToString(), cookieOptions);
+        HttpContextAccessor.HttpContext.Response.Cookies.Append("RefreshToken", refreshToken.Token.ToString(), cookieOptions);
         Context.RefreshTokens.Add(refreshToken);
         await Context.SaveChangesAsync();
     }
@@ -63,5 +65,31 @@ public class TokenService : ITokenService
             .Include(t => t.Owner)
             .Where(t => t.Owner.Id == user.Id && t.Expires < DateTime.UtcNow)
             .ExecuteDeleteAsync();
-    }    
+    }
+    public Guid GetRefreshToken()
+    {
+        if (HttpContextAccessor.HttpContext.Request.Cookies.TryGetValue("RefreshToken", out string? refreshTokenStr))
+        {
+            if (Guid.TryParse(refreshTokenStr, out Guid token))
+            {
+                return token;
+            }
+            else
+            {
+                throw new HttpRequestException("Incorrect refresh token.", null, HttpStatusCode.Unauthorized);
+            }
+        }
+        else
+        {
+            throw new HttpRequestException("Where is your refresh token?", null, HttpStatusCode.Unauthorized);
+        }
+    }
+    public async Task<User> GetUserFromClaims() 
+    {
+        var claim = HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)
+          ?? throw new HttpRequestException("Where is your email claim?", null, HttpStatusCode.Unauthorized);
+        var user = await Context.Users.FirstOrDefaultAsync(u => u.Email == claim.Value)
+            ?? throw new HttpRequestException("This user does not exist.", null, HttpStatusCode.Unauthorized);
+        return user;
+    }
 }
