@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using NotesWebApi.Domains.Persistence;
 using NotesWebApi.Infrastructure;
 using NotesWebApi.Infrastructure.DtoConverters;
+using NotesWebApi.Infrastructure.Middlewares;
 using NotesWebApi.Services;
 using NotesWebApi.Services.DtoConverters;
 using Swashbuckle.AspNetCore.Filters;
@@ -61,7 +62,7 @@ builder.Services.AddTransient<IUserDtoConverter, UserDtoConverter>();
 
 
 var app = builder.Build();
-
+app.UseExceptionHandlerMiddleware();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
