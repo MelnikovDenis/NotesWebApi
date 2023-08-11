@@ -1,4 +1,4 @@
-﻿namespace NotesWebApi.Services.Dto;
+﻿namespace NotesWebApi.Services.Dto.NotesGroup;
 
 public class NotesGroupUpdateDto
 {

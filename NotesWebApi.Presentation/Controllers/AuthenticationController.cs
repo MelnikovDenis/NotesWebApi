@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NotesWebApi.Services;
-using NotesWebApi.Services.Dto;
+using NotesWebApi.Services.Dto.User;
 
 namespace NotesWebApi.Presentation.Controllers;
 

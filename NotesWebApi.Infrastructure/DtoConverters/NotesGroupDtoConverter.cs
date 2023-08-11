@@ -1,6 +1,6 @@
 ﻿using NotesWebApi.Domains.Entities;
 using NotesWebApi.Services;
-using NotesWebApi.Services.Dto;
+using NotesWebApi.Services.Dto.NotesGroup;
 using NotesWebApi.Services.DtoConverters;
 
 namespace NotesWebApi.Infrastructure.DtoConverters;

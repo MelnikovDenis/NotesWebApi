@@ -1,5 +1,5 @@
 ﻿using NotesWebApi.Domains.Entities;
-using NotesWebApi.Services.Dto;
+using NotesWebApi.Services.Dto.User;
 
 namespace NotesWebApi.Services.DtoConverters;
 

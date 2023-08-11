@@ -1,4 +1,4 @@
-﻿namespace NotesWebApi.Services.Dto;
+﻿namespace NotesWebApi.Services.Dto.User;
 
 public class UserRegisterDto
 {

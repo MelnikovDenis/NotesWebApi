@@ -4,9 +4,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NotesWebApi.Domains.Persistence;
 using NotesWebApi.Infrastructure;
+using NotesWebApi.Infrastructure.CrudServiceslmplementations;
 using NotesWebApi.Infrastructure.DtoConverters;
 using NotesWebApi.Infrastructure.Middlewares;
 using NotesWebApi.Services;
+using NotesWebApi.Services.CrudServices;
 using NotesWebApi.Services.DtoConverters;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
@@ -57,7 +59,9 @@ builder.Services.AddTransient<IPasswordService, BcryptPasswordService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<INotesGroupCrudService, NotesGroupCrudService>();
+builder.Services.AddTransient<INoteCrudService, NoteCrudService>();
 builder.Services.AddTransient<INotesGroupDtoConverter, NotesGroupDtoConverter>();
+builder.Services.AddTransient<INoteDtoConverter, NoteDtoConverter>();
 builder.Services.AddTransient<IUserDtoConverter, UserDtoConverter>();
 
 

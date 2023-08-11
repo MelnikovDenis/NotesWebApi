@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NotesWebApi.Domains.Entities;
 using NotesWebApi.Domains.Persistence;
 using NotesWebApi.Services;
-using NotesWebApi.Services.Dto;
+using NotesWebApi.Services.Dto.User;
 using NotesWebApi.Services.DtoConverters;
 using System.Net;
 using System.Security.Claims;

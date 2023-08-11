@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using NotesWebApi.Services.Dto;
+using NotesWebApi.Services.Dto.User;
 using System.Security.Claims;
 
 namespace NotesWebApi.Services;
