@@ -22,6 +22,6 @@ public class NotesGroupConfiguration : IEntityTypeConfiguration<NotesGroup>
 
         builder.HasOne(g => g.Author).WithMany(u => u.Groups).HasForeignKey("UserId").OnDelete(DeleteBehavior.Cascade).IsRequired();
 
-        builder.HasAlternateKey("Title", "UserId");
+        builder.HasIndex("Title", "UserId").IsUnique();
     }
 }

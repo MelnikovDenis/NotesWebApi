@@ -70,9 +70,10 @@ namespace NotesWebApi.Domains.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Title", "UserId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("Title", "UserId")
+                        .IsUnique();
 
                     b.ToTable("NotesGroups");
                 });
@@ -96,7 +97,7 @@ namespace NotesWebApi.Domains.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshToken");
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("NotesWebApi.Domains.Entities.User", b =>

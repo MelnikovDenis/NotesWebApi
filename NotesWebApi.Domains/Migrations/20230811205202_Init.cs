@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NotesWebApi.Domains.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,8 +18,7 @@ namespace NotesWebApi.Domains.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Nickname = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Salt = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -39,9 +38,28 @@ namespace NotesWebApi.Domains.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_NotesGroups", x => x.Id);
-                    table.UniqueConstraint("AK_NotesGroups_Title_UserId", x => new { x.Title, x.UserId });
                     table.ForeignKey(
                         name: "FK_NotesGroups_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Token = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime", nullable: false),
+                    Expires = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Token);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -76,8 +94,19 @@ namespace NotesWebApi.Domains.Migrations
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_NotesGroups_Title_UserId",
+                table: "NotesGroups",
+                columns: new[] { "Title", "UserId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_NotesGroups_UserId",
                 table: "NotesGroups",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
                 column: "UserId");
         }
 
@@ -86,6 +115,9 @@ namespace NotesWebApi.Domains.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Notes");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "NotesGroups");

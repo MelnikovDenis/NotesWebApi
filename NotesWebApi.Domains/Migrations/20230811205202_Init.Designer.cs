@@ -12,8 +12,8 @@ using NotesWebApi.Domains.Persistence;
 namespace NotesWebApi.Domains.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20230808215052_DeleteSalt")]
-    partial class DeleteSalt
+    [Migration("20230811205202_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -73,11 +73,34 @@ namespace NotesWebApi.Domains.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Title", "UserId");
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Title", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("NotesGroups");
+                });
+
+            modelBuilder.Entity("NotesWebApi.Domains.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Token")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Token");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("NotesGroups");
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("NotesWebApi.Domains.Entities.User", b =>
@@ -127,6 +150,17 @@ namespace NotesWebApi.Domains.Migrations
                     b.Navigation("Author");
                 });
 
+            modelBuilder.Entity("NotesWebApi.Domains.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("NotesWebApi.Domains.Entities.User", "Owner")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
+                });
+
             modelBuilder.Entity("NotesWebApi.Domains.Entities.NotesGroup", b =>
                 {
                     b.Navigation("Notes");
@@ -135,6 +169,8 @@ namespace NotesWebApi.Domains.Migrations
             modelBuilder.Entity("NotesWebApi.Domains.Entities.User", b =>
                 {
                     b.Navigation("Groups");
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

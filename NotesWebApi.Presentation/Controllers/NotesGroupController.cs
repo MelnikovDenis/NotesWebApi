@@ -22,4 +22,14 @@ public class NotesGroupController : ControllerBase
     {
         return Ok(await NotesGroupCrudService.Create(notesGroupDto));
     }
+    [HttpPatch("Update"), Authorize]
+    public async Task<IActionResult> Update(NotesGroupUpdateDto notesGroupDto) 
+    {
+        return Ok(await NotesGroupCrudService.Update(notesGroupDto));
+    }
+    [HttpDelete("Delete"), Authorize]
+    public async Task<IActionResult> Delete(Guid id) 
+    {
+        return Ok(await NotesGroupCrudService.Delete(id));
+    }
 }
